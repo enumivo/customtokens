@@ -1,12 +1,12 @@
-#include <eosiolib/eosio.hpp>
-#include <eosiolib/asset.hpp>
+#include <enulib/enu.hpp>
+#include <enulib/asset.hpp>
 
-using eosio::asset;
+using enumivo::asset;
 
-class customtokens_contract : public eosio::contract {
+class customtokens_contract : public enumivo::contract {
  public:
   customtokens_contract(account_name self) :
-    eosio::contract(self),
+    enumivo::contract(self),
     tokens(_self, _self) {}
 
   // A simple set function:
@@ -17,9 +17,9 @@ class customtokens_contract : public eosio::contract {
     require_auth(owner);  // Will need owner permission to consume ram.
 
     // Ensure the asset is a valid type.
-    eosio_assert(customasset.is_valid(),  "asset not valid");
+    enumivo_assert(customasset.is_valid(),  "asset not valid");
     // For simplicity, just allow zero for the initialization value.
-    eosio_assert(customasset.amount == 0, "must init with 0");
+    enumivo_assert(customasset.amount == 0, "must init with 0");
 
     // Look up the balance in the owner account of the specified token.
     // There's probably a better way to check if a token is valid or not,
@@ -27,7 +27,7 @@ class customtokens_contract : public eosio::contract {
     if (owner != _self) {  // Let the contract owner skip this validation.
       accounts accountfind(customtoken, owner);
       const auto& owneracc = accountfind.get(customasset.symbol.name());
-      eosio_assert(owneracc.balance.amount > 0, "a bal must exist");
+      enumivo_assert(owneracc.balance.amount > 0, "a bal must exist");
     }
 
     // Find if we need to replace by identifier.
@@ -76,9 +76,9 @@ class customtokens_contract : public eosio::contract {
     asset        customasset;
 
     auto primary_key() const {  return uuid;  }
-    EOSLIB_SERIALIZE(token, (uuid)(owner)(customtoken)(customasset))
+    ENULIB_SERIALIZE(token, (uuid)(owner)(customtoken)(customasset))
   };
-  typedef eosio::multi_index<N(tokens), token> tokens_table;
+  typedef enumivo::multi_index<N(tokens), token> tokens_table;
   tokens_table tokens;
 
   // This is just to help the account lookup, and is not exposed.
@@ -86,7 +86,7 @@ class customtokens_contract : public eosio::contract {
     asset balance;
     auto  primary_key() const {  return balance.symbol.name();  }
   };
-  typedef eosio::multi_index<N(accounts), account> accounts;
+  typedef enumivo::multi_index<N(accounts), account> accounts;
 };
 
-EOSIO_ABI(customtokens_contract, (set)(del)(sudodel))
+ENUMIVO_ABI(customtokens_contract, (set)(del)(sudodel))
